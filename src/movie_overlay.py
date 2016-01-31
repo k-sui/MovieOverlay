@@ -17,7 +17,7 @@ def movie_overlay():
     result = "../result/smile_recog.m4v" 
     fourcc = cv2.VideoWriter_fourcc('m', 'p', '4', 'v')
     # 顔認識用特徴量のファイル指定
-    cascade_path = "C:/Development/Anaconda2/Library/etc/haarcascades/haarcascade_frontalface_alt.xml"
+    cascade_path = "L:\Anaconda3/Library/etc/haarcascades/haarcascade_frontalface_alt.xml"
     #　認識した顔の色を指定。ここでは白。
     color = (255, 255, 255) 
 
@@ -37,11 +37,8 @@ def movie_overlay():
         
         ret,frame = movie.read()
 
-        #image_path = "../result/smile"+str(count)+".png"
-        #cv2.imwrite(image_path, frame)
-
 #        if ret:
-        if ret and count > -1 and count < 120 :
+        if ret and count > -1 and count < 600 :
             # グレースケールに変換
             frame_gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
@@ -61,14 +58,15 @@ def movie_overlay():
     
             out.write(frame)
             if count%10 == 0:
-                d = datetime.datetime.now().strftime("%Y/%m/%d %H:%M:%S")
-                print d + '   現在フレーム数：'+str(count)
-        elif count > 120 :
+                date = datetime.datetime.now().strftime("%Y/%m/%d %H:%M:%S")
+                print(date + '現在フレーム数：'+str(count))
+        elif count > 600 :
+        #else:
             break
         
         count += 1
 
-    print "出力フレーム数："+str(count)
+    print("出力フレーム数："+str(count))
     
 
 def resize_image(image, height, width):
@@ -92,44 +90,28 @@ def overlay(src_image, overlay_image, coordinate):
     # オーバレイ画像のサイズを取得
     ol_height, ol_width = overlay_image.shape[:2]
 
-#    cv2.imwrite("../result/src_tmp0.png", src_image)
-#    cv2.imwrite("../result/overlay_tmp0.png", overlay_image)
-
     # OpenCVの画像データをPILに変換
     
     #　BGRAからRGBAへ変換
-#    src_image_RGB = src_image[::-1, :, ::-1].copy()
-#    overlay_image_RGB = overlay_image[::-1, :, ::-1].copy()
     src_image_RGBA = cv2.cvtColor(src_image, cv2.COLOR_BGR2RGB)
     overlay_image_RGBA = cv2.cvtColor(overlay_image, cv2.COLOR_BGRA2RGBA)
-    
-#    cv2.imwrite("../result/src_tmp1.png", src_image_RGBA)
-#    cv2.imwrite("../result/overlay_tmp1.png", overlay_image_RGBA)
     
     #　PILに変換
     src_image_PIL=Image.fromarray(src_image_RGBA)
     overlay_image_PIL=Image.fromarray(overlay_image_RGBA)
 
-#    src_image_PIL.save("../result/src_tmp2.png")
-#    overlay_image_PIL.save("../result/overlay_tmp2.png")
- 
     # 合成のため、RGBAモードに変更
     src_image_PIL = src_image_PIL.convert('RGBA')
     overlay_image_PIL = overlay_image_PIL.convert('RGBA')
 
-#    src_image_PIL.save("../result/src_tmp3.png")
-#    overlay_image_PIL.save("../result/overlay_tmp3.png")
- 
     # 同じ大きさの透過キャンパスを用意
     tmp = Image.new('RGBA', src_image_PIL.size, (255, 255,255, 0))
     # rect[0]:x, rect[1]:y, rect[2]:width, rect[3]:height
     # 用意したキャンパスに上書き
-    tmp.paste(overlay_image_PIL, (coordinate[0]-ol_height/2, coordinate[1]-ol_width/2), overlay_image_PIL)
+    tmp.paste(overlay_image_PIL, (int(coordinate[0]-ol_height/2), int(coordinate[1]-ol_width/2)), overlay_image_PIL)
     # オリジナルとキャンパスを合成して保存
     result = Image.alpha_composite(src_image_PIL, tmp)
 
-#    result.save("../result/result_tmp2.png")
-    
     return  cv2.cvtColor(np.asarray(result), cv2.COLOR_RGBA2BGR)
         
 if __name__ == '__main__':
