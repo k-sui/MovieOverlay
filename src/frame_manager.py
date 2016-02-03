@@ -5,7 +5,7 @@ Created on 2016/02/03
 '''
 
 from queue import Queue
-from nltk.app.wordnet_app import FRAMES
+import numpy as np
 
 class FacePoint:
     '''
@@ -82,11 +82,12 @@ class FrameManager:
         __frames[LIST_SIZE-1] = faceFrame
 
         # 前後のフレームから連続性を確認する
-        if __frames[CENTER_INDEX-1] is __frames[CENTER_INDEX] is __frames[CENTER_INDEX+1] is not None:
-            # CENTER_INDEXの前後それぞれの組み合わせ
-            for i in range(0, CENTER_INDEX):
-                for j in range(CENTER_INDEX+1, LIST_SIZE):
-        
+        # CENTER_INDEXの前後それぞれの組み合わせ
+        for i in range(0, CENTER_INDEX):
+            for j in range(CENTER_INDEX+1, LIST_SIZE):
+                if __frames[i] is __frames[CENTER_INDEX] is __frames[j] is not None:
+                    connectFaces(__frames[i].faces, __frames[CENTER_INDEX].faces, __frames[j].faces)
+
         return returnFrame
         
         
@@ -94,10 +95,23 @@ class FrameManager:
         
         # facesFとfacesCで連続している顔があれば同じidを振る。　
         # TODO 同じidが複数の顔に振られうる可能性がある。そもそもこの場合だと今の設計ではうまくいかないので一旦放置。
-        for i in (0, len(faceF)):
-            for j in (0, len faceC)):
+        frontFaceNum = len(faceF)
+        centerFaceNum = len(faceC)
+        backFaceNum = len(faceB)
+        for i in (0, frontFaceNum):
+            for j in (0, centerFaceNum):
+                # 同じ顔と判断したら連番にする
                 if compare(facesF[i], facesC[j]) == True:
-                    
+                    facesC[j].id = facesF[i].id
+                else:
+                    # 後のフレームで認識された顔に同じ顔がある場合、その顔も間のフレームにあるものとして補完する。
+                    for k in (0, backFaceNum):
+                        if compare(facesF[i], facesB[k])
+                            facesC[centerFaceNum].id = facesF[i].id
+                            facesC[centerFaceNum].coordinate = (facesF[i].coordinate + facesB[i].coordinate)/2
+                            # 顔の数を1増やす。(あとの処理でもう1つ顔が見つかった場合のため)
+                            centerFaceNum += 1
+
         
     def compare(self, face1, face2):
         
