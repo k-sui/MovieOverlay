@@ -6,8 +6,8 @@ Created on 2016/01/30
 @author: master
 '''
 
-import cv2
 import datetime
+import cv2
 
 def face_recognize():
 
@@ -49,13 +49,13 @@ def face_recognize():
             out.write(frame)
             if count%10 == 0:
                 d = datetime.datetime.now().strftime("%Y/%m/%d %H:%M:%S")
-                print d + '   現在フレーム数：'+str(count)
+                print(d + '   現在フレーム数：'+str(count))
         else:
             break
         
         count += 1
 
-    print "出力フレーム数："+str(count)
+    print("出力フレーム数："+str(count))
     
 if __name__ == '__main__':
     face_recognize()

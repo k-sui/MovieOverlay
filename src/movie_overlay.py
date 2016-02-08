@@ -44,6 +44,8 @@ def movie_overlay():
 
             # 顔認識の実行
             facerecog = cascade.detectMultiScale(frame_gray, scaleFactor=1.1, minNeighbors=1, minSize=(1, 1))
+            
+            
 
             if len(facerecog) > 0:
                 # 認識した顔に画像を上乗せする
@@ -55,6 +57,8 @@ def movie_overlay():
                     # オーバレイ画像の作成
                     frame = overlay(frame, resized_ol_image, [rect[0]+rect[2]/2,rect[1]+rect[3]/2])
         #            cv2.rectangle(image, tuple(rect[0:2]),tuple(rect[0:2]+rect[2:4]), color, thickness=2)
+        
+                    
     
             out.write(frame)
             if count%10 == 0:
