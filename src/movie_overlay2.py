@@ -15,11 +15,14 @@ import frame_manager
 
 def movie_overlay2():
 
-    target = "../target/smile.mp4"
-    result = "../result/smile_recog.m4v" 
+#    target = "../target/smile.mp4"
+    target = "../target/armagedon_cut_high.mp4"
+    result = "../result/armagedon_cut_recog_high_profile.m4v" 
     fourcc = cv2.VideoWriter_fourcc('m', 'p', '4', 'v')
     # 顔認識用特徴量のファイル指定
-    cascade_path = "L:\Anaconda3/Library/etc/haarcascades/haarcascade_frontalface_alt.xml"
+#    cascade_path = "L:\Anaconda3/Library/etc/haarcascades/haarcascade_frontalface_alt.xml"
+    cascade_path = "L:\Anaconda3/Library/etc/haarcascades/haarcascade_profileface.xml"
+#    cascade_path = "L:\Anaconda3/Library/etc/lbpcascades/lbpcascade_profileface.xml"
     #　認識した顔の色を指定。ここでは白。
     color = (255, 255, 255) 
     
@@ -27,7 +30,7 @@ def movie_overlay2():
     frameManager = frame_manager.FrameManager()
 
     movie = cv2.VideoCapture(target)    
-    out = cv2.VideoWriter(result, fourcc, 5.0, (1920,1080))
+    out = cv2.VideoWriter(result, fourcc, 23.0, (720,276))
     # カスケード分類器の特徴量を取得する
     cascade = cv2.CascadeClassifier(cascade_path)
 
@@ -42,8 +45,8 @@ def movie_overlay2():
         
         ret,frame = movie.read()
 
-#        if ret:
-        if ret and count > -1 and count < 200 :
+        if ret:
+#        if ret and count > -1 and count < 200 :
             # グレースケールに変換
             frame_gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
@@ -81,8 +84,8 @@ def movie_overlay2():
             if count%10 == 0:
                 date = datetime.datetime.now().strftime("%Y/%m/%d %H:%M:%S")
                 print(date + '現在フレーム数：'+str(count))
-        elif count > 200 :
-        #else:
+#        elif count > 200 :
+        else:
             break
         
         count += 1
