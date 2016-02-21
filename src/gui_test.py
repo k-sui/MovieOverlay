@@ -1,40 +1,32 @@
-'''
-Created on 2016/02/14
+# -*- coding: utf-8 -*-
 
-@author: master
-'''
-from PyQt5.QtWidgets import QWidget, QPushButton, QGridLayout
+"""
+ZetCode PyQt4 tutorial 
 
-class TestWidget(QWidget):
+In this example, we create a simple
+window in PyQt4.
 
-    def __init__(self, parent=None):
-        # コンストラクタ
-        QWidget.__init__(self, parent=parent)
-        # 実際の生成コード
-        self.setup_ui()
+author: Jan Bodnar
+website: zetcode.com 
+last edited: October 2011
+"""
 
-    def setup_ui(self):
-        # QPushButtonのインスタンスを作る
-        #self.start_button = QtGui.QPushButton("START", parent=self)
-        #self.stop_button = QtGui.QPushButton("STOP", parent=self)
-        self.reset_button = QPushButton("RESET", parent=self)
-        self.quit_button = QPushButton("QUIT", parent=self)
+import sys
+from PyQt4 import QtGui
 
-        # Buttonをレイアウトマネージャに入れる
-        layout = QGridLayout()
-        #layout.addWidget(self.start_button, 0, 0)
-        #layout.addWidget(self.stop_button, 0, 1)
-        layout.addWidget(self.reset_button, 1, 0)
-        layout.addWidget(self.quit_button, 1, 1)
-        
-        # レイアウトマネージャをWidgetに入れる
-        self.setLayout(layout)
+
+def main():
+    
+    app = QtGui.QApplication(sys.argv)
+
+    w = QtGui.QWidget()
+    w.resize(250, 150)
+    w.move(300, 300)
+    w.setWindowTitle('Simple')
+    w.show()
+    
+    sys.exit(app.exec_())
 
 
 if __name__ == '__main__':
-    
-    w = TestWidget()
-    w.show()
-    
-    pass
-
+    main()
