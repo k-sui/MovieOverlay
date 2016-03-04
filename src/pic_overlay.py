@@ -15,14 +15,15 @@ from PIL import Image
 def pic_overlay():
 
     # 顔認識用特徴量のファイル指定
-    cascade_path = "C:/Development/Anaconda2/Library/etc/haarcascades/haarcascade_frontalface_alt.xml"
+    cascade_path = "L:\Anaconda3\Library\etc\haarcascades/haarcascade_frontalface_alt.xml"
     
     # 認識対象ファイルの読み込み
-    image_path = "../target/Lenna.png"
+    #image_path = "../target/Lenna.png"
+    image_path = "target/Lenna.png"
     image = cv2.imread(image_path,cv2.IMREAD_UNCHANGED)
 
     # オーバーレイ画像の読み込み
-    ol_imgae_path = "../target/warai_otoko.png"    
+    ol_imgae_path = "target/warai_otoko.png"    
     ol_image = cv2.imread(ol_imgae_path,cv2.IMREAD_UNCHANGED)
     
     # グレースケールに変換
@@ -43,8 +44,8 @@ def pic_overlay():
     facerecog = cascade.detectMultiScale(image_gray, scaleFactor=1.1, minNeighbors=1, minSize=(1, 1))
     
     # 認識結果を表示
-    print "認識した場所は"
-    print facerecog
+    print ("認識した場所は")
+    print (facerecog)
     
     if len(facerecog) > 0:
         # 認識した顔全てを矩形で囲む
@@ -59,7 +60,8 @@ def pic_overlay():
     
         # 認識結果の出力
         # cv2.imwrite("../result/Lenna_result.jpg", image)
-        cv2.imwrite("../result/Lenna_result.jpg", image)
+        #cv2.imwrite("../result/Lenna_result.jpg", image)
+        cv2.imwrite("result/Lenna_result.jpg", image)
     
 def resize_image(image, height, width):
     
@@ -94,13 +96,11 @@ def overlay(src_image, overlay_image, coordinate):
     
     pt = [coordinate[0]-ol_height/2, coordinate[1]-ol_width/2, coordinate[0]+ol_height/2, coordinate[1]+ol_width/2]
     
-    print pt
+    print (pt)
     
     # 重ね合わせる先の画像から、透過率分の色を減らす
-#    src_image[pt[0]:pt[2]:, pt[1]:pt[3]] *= 1.0 - alpha  # 透過率に応じて元の画像を暗くする。
-#    src_image[pt[0]:pt[2]:, pt[1]:pt[3]] += overlay_image * alpha
-    print src_image.shape
-    print overlay_image.shape
+    print (src_image.shape)
+    print (overlay_image.shape)
     src_image[pt[0]:pt[2]:, pt[1]:pt[3]] *= 1  # 透過率に応じて元の画像を暗くする。
     src_image[pt[0]:pt[2]:, pt[1]:pt[3]] += overlay_image
     
@@ -112,43 +112,27 @@ def overlay2(src_image, overlay_image, coordinate):
     # オーバレイ画像のサイズを取得
     ol_height, ol_width = overlay_image.shape[:2]
 
-#    cv2.imwrite("../result/src_tmp0.png", src_image)
-#    cv2.imwrite("../result/overlay_tmp0.png", overlay_image)
-
     # OpenCVの画像データをPILに変換
     
     #　BGRAからRGBAへ変換
-#    src_image_RGB = src_image[::-1, :, ::-1].copy()
-#    overlay_image_RGB = overlay_image[::-1, :, ::-1].copy()
     src_image_RGBA = cv2.cvtColor(src_image, cv2.COLOR_BGR2RGB)
     overlay_image_RGBA = cv2.cvtColor(overlay_image, cv2.COLOR_BGRA2RGBA)
-    
-#    cv2.imwrite("../result/src_tmp1.png", src_image_RGBA)
-#    cv2.imwrite("../result/overlay_tmp1.png", overlay_image_RGBA)
     
     #　PILに変換
     src_image_PIL=Image.fromarray(src_image_RGBA)
     overlay_image_PIL=Image.fromarray(overlay_image_RGBA)
 
-#    src_image_PIL.save("../result/src_tmp2.png")
-#    overlay_image_PIL.save("../result/overlay_tmp2.png")
- 
     # 合成のため、RGBAモードに変更
     src_image_PIL = src_image_PIL.convert('RGBA')
     overlay_image_PIL = overlay_image_PIL.convert('RGBA')
 
-#    src_image_PIL.save("../result/src_tmp3.png")
-#    overlay_image_PIL.save("../result/overlay_tmp3.png")
- 
     # 同じ大きさの透過キャンパスを用意
     tmp = Image.new('RGBA', src_image_PIL.size, (255, 255,255, 0))
     # rect[0]:x, rect[1]:y, rect[2]:width, rect[3]:height
     # 用意したキャンパスに上書き
-    tmp.paste(overlay_image_PIL, (coordinate[0]-ol_height/2, coordinate[1]-ol_width/2), overlay_image_PIL)
+    tmp.paste(overlay_image_PIL, (int(coordinate[0]-ol_height/2), int(coordinate[1]-ol_width/2)), overlay_image_PIL)
     # オリジナルとキャンパスを合成して保存
     result = Image.alpha_composite(src_image_PIL, tmp)
-
-#    result.save("../result/result_tmp2.png")
     
     return  cv2.cvtColor(np.asarray(result), cv2.COLOR_RGBA2BGRA)
         

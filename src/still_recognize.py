@@ -35,8 +35,8 @@ cascade = cv2.CascadeClassifier(cascade_path)
 facerecog = cascade.detectMultiScale(image_gray, scaleFactor=1.1, minNeighbors=1, minSize=(1, 1))
 
 # 認識結果を表示
-print "認識した場所は"
-print facerecog
+print ("認識した場所は")
+print (facerecog)
 
 #　認識した顔の色を指定。ここでは白。
 color = (255, 255, 255) 
