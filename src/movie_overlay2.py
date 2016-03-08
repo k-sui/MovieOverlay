@@ -16,12 +16,12 @@ import frame_manager
 def movie_overlay2():
 
 #    target = "../target/smile.mp4"
-    target = "../target/armagedon_cut_high.mp4"
-    result = "../result/armagedon_cut_recog_high_profile.m4v" 
+    target = "../target/ameniutaeba.mp4"
+    result = "../result/ameniutaeba.mv4" 
     fourcc = cv2.VideoWriter_fourcc('m', 'p', '4', 'v')
     # 顔認識用特徴量のファイル指定
-#    cascade_path = "L:\Anaconda3/Library/etc/haarcascades/haarcascade_frontalface_alt.xml"
-    cascade_path = "L:\Anaconda3/Library/etc/haarcascades/haarcascade_profileface.xml"
+    cascade_path = "L:\Anaconda3/Library/etc/haarcascades/haarcascade_frontalface_alt.xml"
+#    cascade_path = "L:\Anaconda3/Library/etc/haarcascades/haarcascade_profileface.xml"
 #    cascade_path = "L:\Anaconda3/Library/etc/lbpcascades/lbpcascade_profileface.xml"
     #　認識した顔の色を指定。ここでは白。
     color = (255, 255, 255) 
