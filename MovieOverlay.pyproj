@@ -5,7 +5,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{6e36258b-13ff-48c2-a43c-5cdbcfdd8086}</ProjectGuid>
     <ProjectHome />
-    <StartupFile>src\movie_overlay2.py</StartupFile>
+    <StartupFile>src\view_usb_camera.py</StartupFile>
     <SearchPath />
     <WorkingDirectory>.</WorkingDirectory>
     <OutputPath>.</OutputPath>
@@ -21,11 +21,20 @@
     <PtvsTargetsFile>$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets</PtvsTargetsFile>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="src\bytatabox\main_setup.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="src\export_movie.py" />
     <Compile Include="src\face_manager.py" />
     <Compile Include="src\frame_manager.py" />
     <Compile Include="src\gui_test.py" />
     <Compile Include="src\importMovie.py" />
+    <Compile Include="src\view_def.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="src\view_usb_camera.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="src\movie_overlay.py" />
     <Compile Include="src\movie_overlay2.py" />
     <Compile Include="src\movie_overlay3.py" />
@@ -38,9 +47,15 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="src" />
+    <Folder Include="src\bytatabox\" />
   </ItemGroup>
   <ItemGroup>
     <InterpreterReference Include="{9a7a9026-48c1-4688-9d5d-e5699d47d074}\3.5" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="src\bytatabox\opencv_test.py">
+      <SubType>Code</SubType>
+    </Content>
   </ItemGroup>
   <Import Project="$(PtvsTargetsFile)" Condition="Exists($(PtvsTargetsFile))" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.Common.targets" Condition="!Exists($(PtvsTargetsFile))" />

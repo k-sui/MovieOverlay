@@ -17,12 +17,12 @@ import queue
 def movie_overlay3():
 
 #    target = "../target/smile.mp4"
-    target = "../target/armagedon_cut_high.mp4"
-    result = "../result/armagedon_cut_recog_high_profile.m4v" 
+    target = "L:\cvtest/target/ameniutaeba.mp4"
+    result = "L:\cvtest/result/ameniutaeba.mp4" 
     fourcc = cv2.VideoWriter_fourcc('m', 'p', '4', 'v')
     # 顔認識用特徴量のファイル指定
-#    cascade_path = "L:\Anaconda3/Library/etc/haarcascades/haarcascade_frontalface_alt.xml"
-    cascade_path = "L:\Anaconda3/Library/etc/haarcascades/haarcascade_profileface.xml"
+    cascade_path = "L:\Anaconda3/Library/etc/haarcascades/haarcascade_frontalface_alt.xml"
+#    cascade_path = "L:\Anaconda3/Library/etc/haarcascades/haarcascade_profileface.xml"
 #    cascade_path = "L:\Anaconda3/Library/etc/lbpcascades/lbpcascade_profileface.xml"
     #　認識した顔の色を指定。ここでは白。
     color = (255, 255, 255) 
@@ -39,7 +39,7 @@ def movie_overlay3():
     cascade = cv2.CascadeClassifier(cascade_path)
 
     # オーバーレイ画像の読み込み
-    ol_imgae_path = "../target/warai_otoko.png"    
+    ol_imgae_path = "L:\cvtest/target/warai_otoko.png"    
     ol_image = cv2.imread(ol_imgae_path,cv2.IMREAD_UNCHANGED)
     
     
@@ -49,8 +49,8 @@ def movie_overlay3():
         
         ret,frame = movie.read()
 
-        if ret:
-#        if ret and count > -1 and count < 200 :
+#        if ret:
+        if ret and count > -1 and count < 200 :
             # グレースケールに変換
             frame_gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
@@ -94,8 +94,8 @@ def movie_overlay3():
             if count%10 == 0:
                 date = datetime.datetime.now().strftime("%Y/%m/%d %H:%M:%S")
                 print(date + '現在フレーム数：'+str(count))
-#        elif count > 200 :
-        else:
+        elif count > 200 :
+#        else:
             break
         
         count += 1
@@ -110,6 +110,10 @@ def movie_overlay3():
         
         # フレームごとの顔情報をキューに保存
         faceQueue.put(managedFrame.faces)
+
+        # 次のフレームの読みだし
+        managedFrame = frameManager.put(None, None)
+
         
     print("出力フレーム数："+str(count))
     
@@ -160,6 +164,9 @@ def overlay(src_image, overlay_image, coordinate):
     return  cv2.cvtColor(np.asarray(result), cv2.COLOR_RGBA2BGR)
 
 def overlay_faces(src_image, ol_image, faces, writeID = False):
+    # 戻り値とする変数
+    dst_image = src_image
+        
     # 認識した顔に画像を上乗せする
     for i in range(0,len(faces)):
 
@@ -171,9 +178,6 @@ def overlay_faces(src_image, ol_image, faces, writeID = False):
         resized_ol_image = resize_image(ol_image, tmpCoord[2], tmpCoord[3])
         
         print("認識した顔の数(ID) = "+str(tmpId))
-        
-        # 戻り値とする変数
-        dst_image = src_image
         
         # 特定のidのみ顔を上書き
         if True:#tmpId < 20 :
