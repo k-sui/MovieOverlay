@@ -12,22 +12,28 @@ import numpy as np
 from PIL import Image
 
 def movie_overlay():
-
+    
+    # 入力する動画と出力パスを指定。
     target = "../target/smile.mp4"
     result = "../result/smile_recog.m4v" 
     fourcc = cv2.VideoWriter_fourcc('m', 'p', '4', 'v')
-    # 顔認識用特徴量のファイル指定
-    cascade_path = "L:\Anaconda3/Library/etc/haarcascades/haarcascade_frontalface_alt.xml"
-    #　認識した顔の色を指定。ここでは白。
-    color = (255, 255, 255) 
 
-    movie = cv2.VideoCapture(target)    
-    out = cv2.VideoWriter(result, fourcc, 23.0, (1920,1080))
+    # 動画の読み込みと動画情報の取得
+    movie = cv2.VideoCapture(target) 
+    fps    = movie.get(cv2.CAP_PROP_FPS)
+    height = movie.get(cv2.CAP_PROP_FRAME_HEIGHT)
+    width  = movie.get(cv2.CAP_PROP_FRAME_WIDTH)
+    fourcc = movie.get(cv2.CAP_PROP_FOURCC)
+    
+    # 出力先のファイルを開く
+    out = cv2.VideoWriter(result, fourcc, fps, (width,height))
+
     # カスケード分類器の特徴量を取得する
+    cascade_path = "haarcascades/haarcascade_frontalface_alt.xml"
     cascade = cv2.CascadeClassifier(cascade_path)
 
     # オーバーレイ画像の読み込み
-    ol_imgae_path = "../target/warai_otoko.png"    
+    ol_imgae_path = "target/warai_otoko.png"    
     ol_image = cv2.imread(ol_imgae_path,cv2.IMREAD_UNCHANGED)
     
     
@@ -54,7 +60,6 @@ def movie_overlay():
                     
                     # オーバレイ画像の作成
                     frame = overlay(frame, resized_ol_image, [rect[0]+rect[2]/2,rect[1]+rect[3]/2])
-        #            cv2.rectangle(image, tuple(rect[0:2]),tuple(rect[0:2]+rect[2:4]), color, thickness=2)
     
             out.write(frame)
             if count%10 == 0:
