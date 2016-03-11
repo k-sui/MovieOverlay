@@ -11,22 +11,23 @@ import datetime
 import numpy as np
 from PIL import Image
 
-def movie_overlay():
-    
+def overlay_movie():
+
     # 入力する動画と出力パスを指定。
-    target = "../target/smile.mp4"
-    result = "../result/smile_recog.m4v" 
-    fourcc = cv2.VideoWriter_fourcc('m', 'p', '4', 'v')
+    target = "target/test_input.mp4"
+    result = "result/test_output.m4v" 
 
     # 動画の読み込みと動画情報の取得
     movie = cv2.VideoCapture(target) 
     fps    = movie.get(cv2.CAP_PROP_FPS)
     height = movie.get(cv2.CAP_PROP_FRAME_HEIGHT)
     width  = movie.get(cv2.CAP_PROP_FRAME_WIDTH)
-    fourcc = movie.get(cv2.CAP_PROP_FOURCC)
+
+    # 形式はMP4Vを指定
+    fourcc = cv2.VideoWriter_fourcc('m', 'p', '4', 'v')
     
     # 出力先のファイルを開く
-    out = cv2.VideoWriter(result, fourcc, fps, (width,height))
+    out = cv2.VideoWriter(result, int(fourcc), fps, (int(width), int(height)))
 
     # カスケード分類器の特徴量を取得する
     cascade_path = "haarcascades/haarcascade_frontalface_alt.xml"
@@ -35,43 +36,48 @@ def movie_overlay():
     # オーバーレイ画像の読み込み
     ol_imgae_path = "target/warai_otoko.png"    
     ol_image = cv2.imread(ol_imgae_path,cv2.IMREAD_UNCHANGED)
-    
-    
-    count = 0
-    
-    while movie.isOpened():
         
+    # 最初の1フレームを読み込む
+    if movie.isOpened() == True:
+        ret,frame = movie.read()
+    else:
+        ret = False
+
+    # フレームの読み込みに成功している間フレームを書き出し続ける
+    while ret:
+        
+        # グレースケールに変換
+        frame_gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+
+        # 顔認識の実行
+        facerecog = cascade.detectMultiScale(frame_gray, scaleFactor=1.1, minNeighbors=1, minSize=(1, 1))
+
+        if len(facerecog) > 0:
+            # 認識した顔に画像を上乗せする
+            for rect in facerecog:
+
+                # 認識範囲にあわせて画像をリサイズ
+                resized_ol_image = resize_image(ol_image, rect[2], rect[3])
+                    
+                # オーバレイ画像の作成
+                frame = overlayOnPart(frame, resized_ol_image, rect[0],rect[1])
+
+        # 読み込んだフレームを書き込み
+        out.write(frame)
+
+        # 次のフレームを読み込み
         ret,frame = movie.read()
 
-#        if ret:
-        if ret and count > -1 and count < 600 :
-            # グレースケールに変換
-            frame_gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+        # 経過を確認するために100フレームごとに経過を出力
+        if movie.get(cv2.CAP_PROP_POS_FRAMES)%100 == 0:
+            date = datetime.datetime.now().strftime("%Y/%m/%d %H:%M:%S")
+            print(date + '  現在フレーム数：'+str(int(movie.get(cv2.CAP_PROP_POS_FRAMES))))
 
-            # 顔認識の実行
-            facerecog = cascade.detectMultiScale(frame_gray, scaleFactor=1.1, minNeighbors=1, minSize=(1, 1))
-
-            if len(facerecog) > 0:
-                # 認識した顔に画像を上乗せする
-                for rect in facerecog:
-
-                    # 認識範囲にあわせて画像をリサイズ
-                    resized_ol_image = resize_image(ol_image, rect[2], rect[3])
-                    
-                    # オーバレイ画像の作成
-                    frame = overlay(frame, resized_ol_image, [rect[0]+rect[2]/2,rect[1]+rect[3]/2])
-    
-            out.write(frame)
-            if count%10 == 0:
-                date = datetime.datetime.now().strftime("%Y/%m/%d %H:%M:%S")
-                print(date + '現在フレーム数：'+str(count))
-        elif count > 600 :
-        #else:
+        # 長いので500フレームまでで終了する
+        if movie.get(cv2.CAP_PROP_POS_FRAMES) > 500:
             break
-        
-        count += 1
 
-    print("出力フレーム数："+str(count))
+    print("完了")
     
 
 def resize_image(image, height, width):
@@ -90,13 +96,12 @@ def resize_image(image, height, width):
     return resized    
 
 # PILを使って画像を合成
-def overlay(src_image, overlay_image, coordinate):
+def overlayOnPart(src_image, overlay_image, posX, posY):
 
     # オーバレイ画像のサイズを取得
     ol_height, ol_width = overlay_image.shape[:2]
 
     # OpenCVの画像データをPILに変換
-    
     #　BGRAからRGBAへ変換
     src_image_RGBA = cv2.cvtColor(src_image, cv2.COLOR_BGR2RGB)
     overlay_image_RGBA = cv2.cvtColor(overlay_image, cv2.COLOR_BGRA2RGBA)
@@ -111,13 +116,13 @@ def overlay(src_image, overlay_image, coordinate):
 
     # 同じ大きさの透過キャンパスを用意
     tmp = Image.new('RGBA', src_image_PIL.size, (255, 255,255, 0))
-    # rect[0]:x, rect[1]:y, rect[2]:width, rect[3]:height
     # 用意したキャンパスに上書き
-    tmp.paste(overlay_image_PIL, (int(coordinate[0]-ol_height/2), int(coordinate[1]-ol_width/2)), overlay_image_PIL)
+    tmp.paste(overlay_image_PIL, (posX, posY), overlay_image_PIL)
     # オリジナルとキャンパスを合成して保存
     result = Image.alpha_composite(src_image_PIL, tmp)
-
+    
+    # COLOR_RGBA2BGRA から COLOR_RGBA2BGRに変更。アルファチャンネルを含んでいるとうまく動画に出力されない。
     return  cv2.cvtColor(np.asarray(result), cv2.COLOR_RGBA2BGR)
-        
+               
 if __name__ == '__main__':
-    movie_overlay()
+    overlay_movie()

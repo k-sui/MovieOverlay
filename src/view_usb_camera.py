@@ -29,24 +29,17 @@ class MyForm(QtGui.QMainWindow):
         target = "L:\cvtest/target/starwars.mp4"
         self.movie = cv2.VideoCapture(target)  
 
-        # 総フレーム数/REDUCT_RATEの配列を確保
+        # 総フレーム数/REDUCT_RATEの配列を確保。初期化。
         faceNum = int(self.movie.get(cv2.CAP_PROP_FRAME_COUNT)/self.REDUCT_RATE + 1)
-#        self.faces = [[-1 for i in range(2)] for j in range(faceNum)]
         self.faces = [[-1, -1, "", 100.0] for j in range(faceNum)]
 
         if self.movie.isOpened() is False:
             raise("IO Error")
 
         #window setup
-#        self.ui.graphic = QtGui.QGraphicsView()
         self.scene = QtGui.QGraphicsScene()
         self.set()
 
-        #update timer
-#        timer = QtCore.QTimer(self.ui.graphic)
-#        timer.timeout.connect(self.set)
-#        timer.start(self.repeatTime)
-      
         
     def set(self):
 

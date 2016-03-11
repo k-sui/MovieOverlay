@@ -32,10 +32,8 @@ def overlay_face():
 
     # 顔認識の実行
     facerecog = cascade.detectMultiScale(image_gray, scaleFactor=1.1, minNeighbors=1, minSize=(1, 1))
-
-  
+      
     if len(facerecog) > 0:
-
 
         # 認識した顔全てに画像を上書きする
         for rect in facerecog:
@@ -101,15 +99,6 @@ def overlayOnPart(src_image, overlay_image, posX, posY):
     return  cv2.cvtColor(np.asarray(result), cv2.COLOR_RGBA2BGRA)
         
 if __name__ == '__main__':
+
     overlay_face()
-
-    # 上書きする画像の読み込み
-#    ol_imgae_path = "target/warai_otoko.png"    
-#    ol_image = cv2.imread(ol_imgae_path,cv2.IMREAD_UNCHANGED)   # アルファチャンネル(透過)も読みこむようにIMREAD_INCHANGEDを指定
-
-    # リサイズ
-#    resized_image = resize_image(ol_image, 100, 100)
-
-    # 認識結果の出力
-#    cv2.imwrite("result/warai_otoko_result.png", resized_image)
 

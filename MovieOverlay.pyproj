@@ -5,7 +5,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{6e36258b-13ff-48c2-a43c-5cdbcfdd8086}</ProjectGuid>
     <ProjectHome />
-    <StartupFile>src\overlay_face.py</StartupFile>
+    <StartupFile>src\overlay_movie.py</StartupFile>
     <SearchPath />
     <WorkingDirectory>.</WorkingDirectory>
     <OutputPath>.</OutputPath>
@@ -35,7 +35,7 @@
     <Compile Include="src\view_usb_camera.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="src\movie_overlay.py" />
+    <Compile Include="src\overlay_movie.py" />
     <Compile Include="src\movie_overlay2.py" />
     <Compile Include="src\movie_overlay3.py" />
     <Compile Include="src\movie_player.py" />
