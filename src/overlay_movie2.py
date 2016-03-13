@@ -1,4 +1,4 @@
-#coding=utf-8
+# -*- coding:utf-8 -*-
 
 '''
 Created on 2016/01/31
@@ -15,31 +15,34 @@ import frame_manager
 
 def movie_overlay2():
 
-#    target = "../target/smile.mp4"
-    target = "../target/ameniutaeba.mp4"
-    result = "../result/ameniutaeba.mv4" 
-    fourcc = cv2.VideoWriter_fourcc('m', 'p', '4', 'v')
-    # 顔認識用特徴量のファイル指定
-    cascade_path = "L:\Anaconda3/Library/etc/haarcascades/haarcascade_frontalface_alt.xml"
-#    cascade_path = "L:\Anaconda3/Library/etc/haarcascades/haarcascade_profileface.xml"
-#    cascade_path = "L:\Anaconda3/Library/etc/lbpcascades/lbpcascade_profileface.xml"
-    #　認識した顔の色を指定。ここでは白。
-    color = (255, 255, 255) 
-    
-    # FrameManagerの作成
-    frameManager = frame_manager.FrameManager()
 
-    movie = cv2.VideoCapture(target)    
-    out = cv2.VideoWriter(result, fourcc, 23.0, (720,276))
+    # 入力する動画と出力パスを指定。
+    target = "target/test_input.mp4"
+    result = "result/test_output.m4v"  #.m4vにしないとエラーが出る
+
+    # 動画の読み込みと動画情報の取得
+    movie = cv2.VideoCapture(target) 
+    fps    = movie.get(cv2.CAP_PROP_FPS)
+    height = movie.get(cv2.CAP_PROP_FRAME_HEIGHT)
+    width  = movie.get(cv2.CAP_PROP_FRAME_WIDTH)
+
+    # 形式はMP4Vを指定
+    fourcc = cv2.VideoWriter_fourcc('m', 'p', '4', 'v')
+    
+    # 出力先のファイルを開く
+    out = cv2.VideoWriter(result, int(fourcc), fps, (int(width), int(height)))
+
     # カスケード分類器の特徴量を取得する
+    cascade_path = "haarcascades/haarcascade_frontalface_alt.xml"
     cascade = cv2.CascadeClassifier(cascade_path)
 
     # オーバーレイ画像の読み込み
-    ol_imgae_path = "../target/warai_otoko.png"    
+    ol_imgae_path = "target/warai_otoko.png"    
     ol_image = cv2.imread(ol_imgae_path,cv2.IMREAD_UNCHANGED)
     
+    # FrameManagerの作成
+    frameManager = frame_manager.FrameManager()
     
-    count = 0
     
     while movie.isOpened():
         
@@ -67,7 +70,7 @@ def movie_overlay2():
                     tmpId = managedFrame.faces[i].id
                     
                     # 認識範囲にあわせて画像をリサイズ
-                    resized_ol_image = resize_image(ol_image, tmpCoord[2], tmpCoord[3])
+                    resized_ol_image = resizeImage(ol_image, tmpCoord[2], tmpCoord[3])
                     
                     print("認識した顔の数(ID) = "+str(tmpId))
                     
@@ -92,8 +95,8 @@ def movie_overlay2():
 
     print("出力フレーム数："+str(count))
     
-
-def resize_image(image, height, width):
+# 画像のサイズを修正する
+def resizeImage(image, height, width):
     
     # 元々のサイズを取得
     org_height, org_width = image.shape[:2]
@@ -109,13 +112,12 @@ def resize_image(image, height, width):
     return resized    
 
 # PILを使って画像を合成
-def overlay(src_image, overlay_image, coordinate):
+def overlayOnPart(src_image, overlay_image, posX, posY):
 
     # オーバレイ画像のサイズを取得
     ol_height, ol_width = overlay_image.shape[:2]
 
     # OpenCVの画像データをPILに変換
-    
     #　BGRAからRGBAへ変換
     src_image_RGBA = cv2.cvtColor(src_image, cv2.COLOR_BGR2RGB)
     overlay_image_RGBA = cv2.cvtColor(overlay_image, cv2.COLOR_BGRA2RGBA)
@@ -130,12 +132,12 @@ def overlay(src_image, overlay_image, coordinate):
 
     # 同じ大きさの透過キャンパスを用意
     tmp = Image.new('RGBA', src_image_PIL.size, (255, 255,255, 0))
-    # rect[0]:x, rect[1]:y, rect[2]:width, rect[3]:height
     # 用意したキャンパスに上書き
-    tmp.paste(overlay_image_PIL, (int(coordinate[0]-ol_height/2), int(coordinate[1]-ol_width/2)), overlay_image_PIL)
+    tmp.paste(overlay_image_PIL, (posX, posY), overlay_image_PIL)
     # オリジナルとキャンパスを合成して保存
     result = Image.alpha_composite(src_image_PIL, tmp)
-
+    
+    # COLOR_RGBA2BGRA から COLOR_RGBA2BGRに変更。アルファチャンネルを含んでいるとうまく動画に出力されない。
     return  cv2.cvtColor(np.asarray(result), cv2.COLOR_RGBA2BGR)
         
 if __name__ == '__main__':

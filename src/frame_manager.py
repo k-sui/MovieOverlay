@@ -7,11 +7,10 @@ Created on 2016/02/03
 
 import numpy as np
 
-class FacePoint:
+class FacePosition:
     '''
-    classdocs
+    
     '''
-
 
     def __init__(self, id, coordinate):
         '''
@@ -47,11 +46,11 @@ class FaceFrame:
 #            else:
 #                self.faces[i] = FacePoint(-1, coordinates[i])
 #
-            self.faces[i] = FacePoint(FaceFrame.faceCount, coordinates[i])
+            self.faces[i] = FacePosition(FaceFrame.faceCount, coordinates[i])
             FaceFrame.faceCount += 1
 
     def append(self, faceId, coordinate):
-        self.faces.append(FacePoint(faceId, coordinate))
+        self.faces.append(FacePosition(faceId, coordinate))
 
 class FrameManager:
     

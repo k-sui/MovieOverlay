@@ -15,7 +15,7 @@ def overlay_movie():
 
     # 入力する動画と出力パスを指定。
     target = "target/test_input.mp4"
-    result = "result/test_output.m4v" 
+    result = "result/test_output.m4v"  #.m4vにしないとエラーが出る
 
     # 動画の読み込みと動画情報の取得
     movie = cv2.VideoCapture(target) 
@@ -73,9 +73,9 @@ def overlay_movie():
             date = datetime.datetime.now().strftime("%Y/%m/%d %H:%M:%S")
             print(date + '  現在フレーム数：'+str(int(movie.get(cv2.CAP_PROP_POS_FRAMES))))
 
-        # 長いので500フレームまでで終了する
-        if movie.get(cv2.CAP_PROP_POS_FRAMES) > 500:
-            break
+        # 長いので途中のフレームまでで終了する
+#        if movie.get(cv2.CAP_PROP_POS_FRAMES) > 1000:
+#            break
 
     print("完了")
     
