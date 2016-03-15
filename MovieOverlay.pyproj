@@ -36,7 +36,7 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="src\overlay_movie.py" />
-    <Compile Include="src\movie_overlay2.py" />
+    <Compile Include="src\overlay_movie2.py" />
     <Compile Include="src\movie_overlay3.py" />
     <Compile Include="src\movie_player.py" />
     <Compile Include="src\movie_recognize.py" />

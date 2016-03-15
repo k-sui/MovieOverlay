@@ -13,8 +13,7 @@ from PIL import Image
 
 import frame_manager
 
-def movie_overlay2():
-
+def overlay_movie2():
 
     # 入力する動画と出力パスを指定。
     target = "target/test_input.mp4"
@@ -42,58 +41,60 @@ def movie_overlay2():
     
     # FrameManagerの作成
     frameManager = frame_manager.FrameManager()
+
+    #　認識した顔を囲む矩形の色を指定。ここでは白。
+    color = (255, 255, 255) 
     
-    
-    while movie.isOpened():
-        
+    # 最初の1フレームを読み込む
+    if movie.isOpened() == True:
         ret,frame = movie.read()
+    else:
+        ret = False
 
-        if ret:
-#        if ret and count > -1 and count < 200 :
-            # グレースケールに変換
-            frame_gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+    # フレームの読み込みに成功している間フレームを書き出し続ける
+    while ret:
+        
+        # グレースケールに変換
+        frame_gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
-            # 顔認識の実行
-            facerecog = cascade.detectMultiScale(frame_gray, scaleFactor=1.1, minNeighbors=1, minSize=(1, 1))
+        # 顔認識の実行
+        facerecog = cascade.detectMultiScale(frame_gray, scaleFactor=1.1, minNeighbors=1, minSize=(1, 1))
             
-            # 認識した顔をFrameManagerに入れる
-            managedFrame = frameManager.put(frame, facerecog)
+        # 認識した顔をFrameManagerに入れる
+        managedFrame = frameManager.put(frame, facerecog)
 
-            # 5回め以降はFrameManagerからフレームが返ってくるのでファイル出力
-            if managedFrame is not None:
+        # 5回め以降はFrameManagerからフレームが返ってくるのでファイル出力
+        if managedFrame is not None:
 
-                # 認識した顔に画像を上乗せする
-                for i in range(0,len(managedFrame.faces)):
+            # 認識した顔に画像を上乗せする
+            for i in range(0,len(managedFrame.faces)):
 
-                    # 扱いやすいように変数を用意
-                    tmpCoord = managedFrame.faces[i].coordinate
-                    tmpId = managedFrame.faces[i].id
+                # 扱いやすいように変数を用意
+                tmpCoord = managedFrame.faces[i].coordinate
+                tmpId = managedFrame.faces[i].id
                     
-                    # 認識範囲にあわせて画像をリサイズ
-                    resized_ol_image = resizeImage(ol_image, tmpCoord[2], tmpCoord[3])
+                # 認識範囲にあわせて画像をリサイズ
+#                resized_ol_image = resizeImage(ol_image, tmpCoord[2], tmpCoord[3])
                     
-                    print("認識した顔の数(ID) = "+str(tmpId))
+                print("認識した顔の数(ID) = "+str(tmpId))
+                                        
+                # 矩形で囲む
+                cv2.rectangle(managedFrame.frame, tuple(tmpCoord[0:2]),tuple(tmpCoord[0:2]+tmpCoord[2:4]), color, thickness=2)
                     
-                    # 特定のidのみ顔を上書き
-                    if True:#tmpId < 20 :
-                    
-                        # オーバレイ画像の作成
-                        managedFrame.frame = overlay(managedFrame.frame, resized_ol_image, [tmpCoord[0]+tmpCoord[2]/2,tmpCoord[1]+tmpCoord[3]/2])
-                    
-                        # 顔のIDを書き込み
-                        cv2.putText(managedFrame.frame,str(tmpId),(tmpCoord[0],tmpCoord[1]),cv2.FONT_HERSHEY_PLAIN, 10, (255,0,0))
+                # 顔のIDを書き込み
+                cv2.putText(managedFrame.frame,str(tmpId),(tmpCoord[0],tmpCoord[1]),cv2.FONT_HERSHEY_PLAIN, 10, (255,0,0))
     
-                out.write(managedFrame.frame)
-            if count%10 == 0:
-                date = datetime.datetime.now().strftime("%Y/%m/%d %H:%M:%S")
-                print(date + '現在フレーム数：'+str(count))
+            out.write(managedFrame.frame)
+        if count%10 == 0:
+            date = datetime.datetime.now().strftime("%Y/%m/%d %H:%M:%S")
+            print(date + '現在フレーム数：'+str(count))
 #        elif count > 200 :
-        else:
-            break
         
         count += 1
+        ret,frame = movie.read()
 
-    print("出力フレーム数："+str(count))
+        print("出力フレーム数："+str(count))
+
     
 # 画像のサイズを修正する
 def resizeImage(image, height, width):
@@ -141,4 +142,4 @@ def overlayOnPart(src_image, overlay_image, posX, posY):
     return  cv2.cvtColor(np.asarray(result), cv2.COLOR_RGBA2BGR)
         
 if __name__ == '__main__':
-    movie_overlay2()
+    overlay_movie2()
