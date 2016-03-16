@@ -106,7 +106,7 @@ class FrameManager:
 
                     # 間にあるフレーム全てに連続性確認、補完を行う
                     for k in range(i+1, j):
-                        self.connectFaces(self.__frames[i], k, self.__frames[j])
+                        self.connectFaces(self.__frames[i], self.__frames[k], self.__frames[j])
 
         return returnFrame
         

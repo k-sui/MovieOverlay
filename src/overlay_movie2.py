@@ -40,7 +40,7 @@ def overlay_movie2():
     ol_image = cv2.imread(ol_imgae_path,cv2.IMREAD_UNCHANGED)
     
     # FrameManagerの作成
-    frameManager = frame_manager.FrameManager()
+    frameManager = frame_manager.FrameManager(height, width)
 
     #　認識した顔を囲む矩形の色を指定。ここでは白。
     color = (255, 255, 255) 
@@ -50,6 +50,8 @@ def overlay_movie2():
         ret,frame = movie.read()
     else:
         ret = False
+
+    count = 0
 
     # フレームの読み込みに成功している間フレームを書き出し続ける
     while ret:
@@ -88,12 +90,14 @@ def overlay_movie2():
         if count%10 == 0:
             date = datetime.datetime.now().strftime("%Y/%m/%d %H:%M:%S")
             print(date + '現在フレーム数：'+str(count))
-#        elif count > 200 :
         
         count += 1
         ret,frame = movie.read()
 
-        print("出力フレーム数："+str(count))
+        # 途中終了
+        if count > 200 :
+            break
+    print("出力フレーム数："+str(count))
 
     
 # 画像のサイズを修正する
