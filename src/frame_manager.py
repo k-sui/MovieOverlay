@@ -57,16 +57,13 @@ class FrameManager:
     '''
     渡されたフレームと顔認識結果を元に顔の連続性と抜けた顔の補完を行うクラス
     連続している顔には同じIDを割り振る。
-    LIST_SIZE: いくつのFaceFrameを元に顔の連続性を確認するかを指定
-
     '''
-
+    #いくつのFaceFrameを元に顔の連続性を確認するかを指定
     LIST_SIZE = 5
     CENTER_INDEX = int(LIST_SIZE/2)
     # フレーム間の顔が同じ顔であるかを判断する際の、位置、サイズの差をどこまで認めるか。%で指定
-    ALLOWED_GAP = 10
-    
-    
+    ALLOWED_GAP = 5
+        
     def __init__(self, height, width):
         '''
         扱う動画の高さ、幅を指定する
@@ -85,7 +82,7 @@ class FrameManager:
 
         return: FaceFrameのインスタンス。但し、LIST_SIZE番目にFaceFrameインスタンスがない場合はNoneを返す。
         '''
-        # 一番最初のフレームの場合(framesが定義されていない状態の場合)、フレームに初期IDを振る。
+        # 最後に残ったフレーム出力するときにNoneが渡されるので、その場合あfaceFrameもNoneとする。
         if frame is None:
             faceFrame = None
         else:
@@ -106,16 +103,14 @@ class FrameManager:
 
                     # 間にあるフレーム全てに連続性確認、補完を行う
                     for k in range(i+1, j):
-                        self.connectFaces(self.__frames[i], self.__frames[k], self.__frames[j])
+                        self.connectFrame(self.__frames[i], self.__frames[k], self.__frames[j])
 
         return returnFrame
         
         
-    def connectFaces(self, frameF, frameC, frameB):
-
-                
+    def connectFrame(self, frameF, frameC, frameB):               
         # frameF.facesとframeC.facesで連続している顔があれば同じidを振る。　
-        # TODO 同じidが複数の顔に振られうる可能性がある。そもそもこの場合だと今の設計ではうまくいかないので一旦放置。
+        # TODO 同じidが複数の顔に振られうる可能性がある。そもそもこの場合だと今の設計ではうまくいかないので一旦保留。
         frontFaceNum = len(frameF.faces)
         centerFaceNum = len(frameC.faces)
         backFaceNum = len(frameB.faces)
@@ -123,7 +118,7 @@ class FrameManager:
             # 前のフレームの中のi番目の顔が間の顔の中のどれかと合致したかを保持
             matched = False
             for j in range(0, centerFaceNum):
-                # 同じ顔と判断したら連番にする
+                # 同じ顔と判断したら同じIDにする
                 if self.compare(frameF.faces[i], frameC.faces[j]) == True:
                     frameC.faces[j].id = frameF.faces[i].id
                     matched = True
@@ -142,8 +137,7 @@ class FrameManager:
                         if(centerFaceNum>10):
                             break
 
-
-        
+       
     def compare(self, face1, face2):
         '''
         face1、face2が連続したものであるか比較する。

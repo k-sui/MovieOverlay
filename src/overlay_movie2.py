@@ -17,7 +17,7 @@ def overlay_movie2():
 
     # 入力する動画と出力パスを指定。
     target = "target/test_input.mp4"
-    result = "result/test_output.m4v"  #.m4vにしないとエラーが出る
+    result = "result/test_output2.m4v"  #.m4vにしないとエラーが出る
 
     # 動画の読み込みと動画情報の取得
     movie = cv2.VideoCapture(target) 
@@ -68,15 +68,12 @@ def overlay_movie2():
         # 5回め以降はFrameManagerからフレームが返ってくるのでファイル出力
         if managedFrame is not None:
 
-            # 認識した顔に画像を上乗せする
+            # 認識した顔に番号を書き加える
             for i in range(0,len(managedFrame.faces)):
 
                 # 扱いやすいように変数を用意
                 tmpCoord = managedFrame.faces[i].coordinate
                 tmpId = managedFrame.faces[i].id
-                    
-                # 認識範囲にあわせて画像をリサイズ
-#                resized_ol_image = resizeImage(ol_image, tmpCoord[2], tmpCoord[3])
                     
                 print("認識した顔の数(ID) = "+str(tmpId))
                                         
@@ -84,7 +81,7 @@ def overlay_movie2():
                 cv2.rectangle(managedFrame.frame, tuple(tmpCoord[0:2]),tuple(tmpCoord[0:2]+tmpCoord[2:4]), color, thickness=2)
                     
                 # 顔のIDを書き込み
-                cv2.putText(managedFrame.frame,str(tmpId),(tmpCoord[0],tmpCoord[1]),cv2.FONT_HERSHEY_PLAIN, 10, (255,0,0))
+                cv2.putText(managedFrame.frame,str(tmpId),(tmpCoord[0],tmpCoord[1]),cv2.FONT_HERSHEY_TRIPLEX, 2, (100,200,255), thickness=2)
     
             out.write(managedFrame.frame)
         if count%10 == 0:
@@ -97,53 +94,9 @@ def overlay_movie2():
         # 途中終了
         if count > 200 :
             break
+
     print("出力フレーム数："+str(count))
 
     
-# 画像のサイズを修正する
-def resizeImage(image, height, width):
-    
-    # 元々のサイズを取得
-    org_height, org_width = image.shape[:2]
-    
-    # 大きい方のサイズに合わせて縮小
-    if float(height)/org_height > float(width)/org_width:
-        ratio = float(height)/org_height
-    else:
-        ratio = float(width)/org_width
-    
-    resized = cv2.resize(image,(int(org_height*ratio),int(org_width*ratio)))
-    
-    return resized    
-
-# PILを使って画像を合成
-def overlayOnPart(src_image, overlay_image, posX, posY):
-
-    # オーバレイ画像のサイズを取得
-    ol_height, ol_width = overlay_image.shape[:2]
-
-    # OpenCVの画像データをPILに変換
-    #　BGRAからRGBAへ変換
-    src_image_RGBA = cv2.cvtColor(src_image, cv2.COLOR_BGR2RGB)
-    overlay_image_RGBA = cv2.cvtColor(overlay_image, cv2.COLOR_BGRA2RGBA)
-    
-    #　PILに変換
-    src_image_PIL=Image.fromarray(src_image_RGBA)
-    overlay_image_PIL=Image.fromarray(overlay_image_RGBA)
-
-    # 合成のため、RGBAモードに変更
-    src_image_PIL = src_image_PIL.convert('RGBA')
-    overlay_image_PIL = overlay_image_PIL.convert('RGBA')
-
-    # 同じ大きさの透過キャンパスを用意
-    tmp = Image.new('RGBA', src_image_PIL.size, (255, 255,255, 0))
-    # 用意したキャンパスに上書き
-    tmp.paste(overlay_image_PIL, (posX, posY), overlay_image_PIL)
-    # オリジナルとキャンパスを合成して保存
-    result = Image.alpha_composite(src_image_PIL, tmp)
-    
-    # COLOR_RGBA2BGRA から COLOR_RGBA2BGRに変更。アルファチャンネルを含んでいるとうまく動画に出力されない。
-    return  cv2.cvtColor(np.asarray(result), cv2.COLOR_RGBA2BGR)
-        
 if __name__ == '__main__':
     overlay_movie2()
