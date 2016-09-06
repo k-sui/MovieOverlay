@@ -10,35 +10,35 @@ import cv2
 import numpy as np
 from PIL import Image
 
-# PIL‚ğg‚Á‚Ä‰æ‘œ‚ğ‡¬
+# PILã‚’ä½¿ã£ã¦ç”»åƒã‚’åˆæˆ
 def overlayOnPart(src_image, overlay_image, posX, posY, zoom):
 
-    # ƒI[ƒoƒŒƒC‰æ‘œ‚ğ”{—¦‚É‡‚í‚¹‚ÄŠg‘åk¬
+    # ã‚ªãƒ¼ãƒãƒ¬ã‚¤ç”»åƒã‚’å€ç‡ã«åˆã‚ã›ã¦æ‹¡å¤§ç¸®å°
     resized_overlay_image = resize_image(overlay_image, zoom)
 
-    # ƒI[ƒoƒŒƒC‰æ‘œ‚ÌƒTƒCƒY‚ğæ“¾
+    # ã‚ªãƒ¼ãƒãƒ¬ã‚¤ç”»åƒã®ã‚µã‚¤ã‚ºã‚’å–å¾—
     ol_height, ol_width = resized_overlay_image.shape[:2]
 
-    # OpenCV‚Ì‰æ‘œƒf[ƒ^‚ğPIL‚É•ÏŠ·
+    # OpenCVã®ç”»åƒãƒ‡ãƒ¼ã‚¿ã‚’PILã«å¤‰æ›
     
-    #@BGRA‚©‚çRGBA‚Ö•ÏŠ·
+    #ã€€BGRAã‹ã‚‰RGBAã¸å¤‰æ›
     src_image_RGBA = cv2.cvtColor(src_image, cv2.COLOR_BGR2RGB)
     resized_overlay_image_RGBA = cv2.cvtColor(resized_overlay_image, cv2.COLOR_BGRA2RGBA)
     
-    #@PIL‚É•ÏŠ·
+    #ã€€PILã«å¤‰æ›
     src_image_PIL=Image.fromarray(src_image_RGBA)
     resized_overlay_image_PIL=Image.fromarray(resized_overlay_image_RGBA)
 
-    # ‡¬‚Ì‚½‚ßARGBAƒ‚[ƒh‚É•ÏX
+    # åˆæˆã®ãŸã‚ã€RGBAãƒ¢ãƒ¼ãƒ‰ã«å¤‰æ›´
     src_image_PIL = src_image_PIL.convert('RGBA')
     resized_overlay_image_PIL = resized_overlay_image_PIL.convert('RGBA')
 
-    # “¯‚¶‘å‚«‚³‚Ì“§‰ßƒLƒƒƒ“ƒpƒX‚ğ—pˆÓ
+    # åŒã˜å¤§ãã•ã®é€éã‚­ãƒ£ãƒ³ãƒ‘ã‚¹ã‚’ç”¨æ„
     tmp = Image.new('RGBA', src_image_PIL.size, (255, 255,255, 0))
     # rect[0]:x, rect[1]:y, rect[2]:width, rect[3]:height
-    # —pˆÓ‚µ‚½ƒLƒƒƒ“ƒpƒX‚Éã‘‚«
+    # ç”¨æ„ã—ãŸã‚­ãƒ£ãƒ³ãƒ‘ã‚¹ã«ä¸Šæ›¸ã
     tmp.paste(resized_overlay_image_PIL, (int(posX-ol_height/2), int(posY-ol_width/2)), resized_overlay_image_PIL)
-    # ƒIƒŠƒWƒiƒ‹‚ÆƒLƒƒƒ“ƒpƒX‚ğ‡¬‚µ‚Ä•Û‘¶
+    # ã‚ªãƒªã‚¸ãƒŠãƒ«ã¨ã‚­ãƒ£ãƒ³ãƒ‘ã‚¹ã‚’åˆæˆã—ã¦ä¿å­˜
     result = Image.alpha_composite(src_image_PIL, tmp)
 
     return  cv2.cvtColor(np.asarray(result), cv2.COLOR_RGBA2BGR)
@@ -46,12 +46,12 @@ def overlayOnPart(src_image, overlay_image, posX, posY, zoom):
                
 def resize_image(image, zoom):
     
-    # Œ³X‚ÌƒTƒCƒY‚ğæ“¾
+    # å…ƒã€…ã®ã‚µã‚¤ã‚ºã‚’å–å¾—
     org_height, org_width = image.shape[:2]
 
     ratio = float(zoom)/100
     
-    # ‘å‚«‚¢•û‚ÌƒTƒCƒY‚É‡‚í‚¹‚Äk¬
+    # å¤§ãã„æ–¹ã®ã‚µã‚¤ã‚ºã«åˆã‚ã›ã¦ç¸®å°
     resized = cv2.resize(image,(int(org_width*ratio),int(org_height*ratio)))
     
     return resized    
