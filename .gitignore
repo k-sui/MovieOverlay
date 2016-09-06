@@ -3,3 +3,11 @@
 ################################################################################
 
 /.vs/MovieOverlay/v14/.suo
+/src/__pycache__
+/MovieOverlay.sln
+/movieOverlayUI.py
+/movieOverlayUI.ui
+/MovieOverlay.pyproj
+/src/view_def.py
+/src/view_usb_camera.py
+/src/zz_old_frame_manager.py
